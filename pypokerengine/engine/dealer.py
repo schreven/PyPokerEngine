@@ -169,7 +169,7 @@ class Dealer:
     return self.uuid_list.pop()
 
   def __generate_uuid_list(self):
-    return [self.__generate_uuid() for _ in range(100)]
+    return ['uuid-'+str(100-i) for i in range(100)]
 
   def __generate_uuid(self):
     uuid_size = 22

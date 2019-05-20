@@ -144,12 +144,13 @@ class HandEvaluator:
     return self.__search_straight(cards) << 4
 
   @classmethod
-  def __search_straight(self, cards):
+  def search_straight(self, cards):
     bit_memo = reduce(lambda memo, card: memo | 1 << card.rank, cards, 0)
+    bit_memo = bit_memo | 2<<(1<<13&1)
     rank = -1
     straight_check = lambda acc, i: acc & (bit_memo >> (r+i) & 1) == 1
-    for r in range(2, 15):
-      if reduce(straight_check, range(5), True): rank = r
+    for r in range(1, 11):
+      if reduce(straight_check, range(5), True): rank = r+4
     return rank
 
   @classmethod
