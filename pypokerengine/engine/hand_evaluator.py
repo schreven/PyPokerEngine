@@ -144,7 +144,7 @@ class HandEvaluator:
     return self.__search_straight(cards) << 4
 
   @classmethod
-  def search_straight(self, cards):
+  def __search_straight(self, cards):
     bit_memo = reduce(lambda memo, card: memo | 1 << card.rank, cards, 0)
     bit_memo = bit_memo | 2<<(1<<13&1)
     rank = -1
