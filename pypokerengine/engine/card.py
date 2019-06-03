@@ -57,7 +57,6 @@ class Card:
     while rank > 13:
       suit <<= 1
       rank -= 13
-
     return cls(suit, rank)
 
   @classmethod

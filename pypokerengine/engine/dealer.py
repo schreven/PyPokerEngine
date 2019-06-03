@@ -9,14 +9,15 @@ from pypokerengine.engine.message_builder import MessageBuilder
 
 class Dealer:
 
-  def __init__(self, small_blind_amount=None, initial_stack=None, ante=None):
+  def __init__(self, small_blind_amount=None, initial_stack=None, ante=None,cheat = False, cst_cheat_ids =[]):
     self.small_blind_amount = small_blind_amount
     self.ante = ante if ante else 0
     self.initial_stack = initial_stack
     self.uuid_list = self.__generate_uuid_list()
     self.message_handler = MessageHandler()
     self.message_summarizer = MessageSummarizer(verbose=0)
-    self.table = Table()
+    self.cheat = cheat
+    self.table = Table(cheat = self.cheat, cst_cheat_ids = cst_cheat_ids)
     self.blind_structure = {}
 
   def register_player(self, player_name, algorithm):

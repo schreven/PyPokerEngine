@@ -16,6 +16,7 @@ class RoundManager:
     state = self.__deep_copy_state(_state)
     table = state["table"]
 
+
     table.deck.shuffle()
     self.__correct_ante(ante_amount, table.seats.players)
     self.__correct_blind(small_blind_amount, table)

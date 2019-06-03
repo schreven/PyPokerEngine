@@ -70,7 +70,14 @@ class ActionChecker:
   @classmethod
   def __min_raise_amount(self, players, sb_amount):
     raise_ = self.__fetch_last_raise(players)
-    return raise_["amount"] + raise_["add_amount"] if raise_ else sb_amount*2
+    BB_ = self.__fetch_last_BB(players)
+    if BB_:
+        ret = 4*sb_amount
+    elif raise_:
+        ret = raise_["amount"] + raise_["add_amount"]
+    else:
+        ret = sb_amount*2
+    return ret
 
   @classmethod
   def __is_short_of_money(self, player, amount):
@@ -80,9 +87,21 @@ class ActionChecker:
   def __fetch_last_raise(self, players):
     all_histories = [p.action_histories for p in players]
     all_histories = reduce(lambda acc, e: acc + e, all_histories)  # flatten
-    raise_histories = [h for h in all_histories if h["action"] == "RAISE"]
+    raise_histories = [h for h in all_histories if h["action"] in ["RAISE", "SMALLBLIND", "BIGBLIND"]]
     if len(raise_histories) == 0:
       return None
     else:
       return max(raise_histories, key=lambda h: h["amount"])  # maxby
+  
+  @classmethod
+  def __fetch_last_BB(self, players):
+    all_histories = [p.action_histories for p in players]
+    all_histories = reduce(lambda acc, e: acc + e, all_histories)  # flatten
+    last_actions = [h for h in all_histories if h["action"] in ["RAISE", "BIGBLIND"]]
+    if len(last_actions) == 0:
+      return False
+    elif last_actions[-1]["action"] == 'BIGBLIND':
+      return True
+    else:
+      return False
 

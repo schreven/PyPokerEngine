@@ -4,9 +4,9 @@ from pypokerengine.players import BasePokerPlayer
 def setup_config(max_round, initial_stack, small_blind_amount, ante=0):
     return Config(max_round, initial_stack, small_blind_amount, ante)
 
-def start_poker(config, verbose=2):
+def start_poker(config, verbose=2, cheat = False, cst_cheat_ids = []):
     config.validation()
-    dealer = Dealer(config.sb_amount, config.initial_stack, config.ante)
+    dealer = Dealer(config.sb_amount, config.initial_stack, config.ante, cheat=cheat, cst_cheat_ids = cst_cheat_ids)
     dealer.set_verbose(verbose)
     dealer.set_blind_structure(config.blind_structure)
     for info in config.players_info:
