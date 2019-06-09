@@ -1,4 +1,5 @@
 from functools import reduce
+import sys 
 
 class ActionChecker:
 
@@ -37,7 +38,10 @@ class ActionChecker:
     min_raise = self.__min_raise_amount(players, sb_amount)
     max_raise = players[player_pos].stack + players[player_pos].paid_sum()
     if max_raise < min_raise:
-      min_raise = max_raise = -1
+        if self.agree_amount(players)>=max_raise:
+            min_raise = max_raise = -1
+        else:
+            min_raise = max_raise = players[player_pos].stack + players[player_pos].paid_sum()
     return [
         { "action" : "fold" , "amount" : 0 },
         { "action" : "call" , "amount" : self.agree_amount(players) },
@@ -51,14 +55,17 @@ class ActionChecker:
   @classmethod
   def __is_illegal(self, players, player_pos, sb_amount, action, amount=None):
     if action == 'fold':
-      return False
+      illegal= False
     elif action == 'call':
-      return self.__is_short_of_money(players[player_pos], amount)\
+      illegal= self.__is_short_of_money(players[player_pos], amount)\
           or self.__is_illegal_call(players, amount)
     elif action == 'raise':
-      return self.__is_short_of_money(players[player_pos], amount) \
+      illegal= self.__is_short_of_money(players[player_pos], amount) \
           or self.__is_illegal_raise(players, amount, sb_amount)
-
+    if illegal:
+        print('[ERROR] attempting illegal action')
+        #sys.exit(1)
+    return illegal
   @classmethod
   def __is_illegal_call(self, players, amount):
     return amount != self.agree_amount(players)
@@ -70,8 +77,8 @@ class ActionChecker:
   @classmethod
   def __min_raise_amount(self, players, sb_amount):
     raise_ = self.__fetch_last_raise(players)
-    BB_ = self.__fetch_last_BB(players)
-    if BB_:
+    is_BB = self.__last_action_is_BB(players)
+    if is_BB:
         ret = 4*sb_amount
     elif raise_:
         ret = raise_["amount"] + raise_["add_amount"]
@@ -94,7 +101,7 @@ class ActionChecker:
       return max(raise_histories, key=lambda h: h["amount"])  # maxby
   
   @classmethod
-  def __fetch_last_BB(self, players):
+  def __last_action_is_BB(self, players):
     all_histories = [p.action_histories for p in players]
     all_histories = reduce(lambda acc, e: acc + e, all_histories)  # flatten
     last_actions = [h for h in all_histories if h["action"] in ["RAISE", "BIGBLIND"]]

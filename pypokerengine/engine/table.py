@@ -4,11 +4,11 @@ from pypokerengine.engine.deck import Deck
 
 class Table:
 
-  def __init__(self, cheat_deck=None, cheat = False, cst_cheat_ids =[]):
+  def __init__(self, cheat_deck=None, cheat = False, cst_deck_ids =[]):
     self.dealer_btn = 0
     self._blind_pos = None
     self.seats = Seats()
-    self.deck = cheat_deck if cheat_deck else Deck(cheat = cheat, cst_cheat_ids = cst_cheat_ids)
+    self.deck = cheat_deck if cheat_deck else Deck(cheat = cheat, cst_deck_ids = cst_deck_ids)
     self._community_card = []
 
   def set_blind_pos(self, sb_pos, bb_pos):
