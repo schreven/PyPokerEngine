@@ -9,7 +9,7 @@ class ActionChecker:
       amount = players[player_pos].stack + players[player_pos].paid_sum()
     elif self.__is_illegal(players, player_pos, sb_amount, action, amount):    
         print('[ERROR] From action_checker, correct_action: illegal action. Folding')
-      action, amount = "fold", 0
+        action, amount = "fold", 0
     return action, amount
 
 
