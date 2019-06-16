@@ -17,6 +17,12 @@ class Seats:
 
   def count_ask_wait_players(self):
     return len([p for p in self.players if p.is_waiting_ask()])
+  
+  """
+  def count_alive_players(self):
+    print([p.stack for p in self.players if p.stack>=0])
+    return len([p for p in self.players if p.stack>=0])
+  """
 
   def serialize(self):
     return [player.serialize() for player in self.players]

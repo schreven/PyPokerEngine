@@ -38,7 +38,8 @@ class Player:
 
   def collect_bet(self, amount):
     if self.stack < amount:
-      raise ValueError(self.__collect_err_msg % (amount, self.stack))
+        amount=self.stack
+      #raise ValueError(self.__collect_err_msg % (amount, self.stack))
     self.stack -= amount
 
   def is_active(self):

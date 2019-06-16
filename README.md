@@ -1,3 +1,18 @@
+# PyPokerEngine Fork
+This is a fork of the PyPokerEngine repository. The regular readme can be found below.
+
+The differences with the main branch are:
+- fix issue where straights from ace to five where not recognized.
+- fix issue where the players were allowed to raise of one small blind if no actions were taken since the big blind was posted. The correct minimum raise is of one big blind.
+- fix issue where the minimum and maximum raise where not correct when the remaining stack was too low for a regular min-raise but still superior to the call amount. They were at -1 (meaning not available), removing the option to go all-in.
+- fix issue where collecting blinds or antes from a player that did not have enough raised an error. Now the player simply puts all his remaining stack.
+- changed the uuid from random to a predefined string: 'uuid-'+str(player_nb). This is for simpler 'round_state' reading and debugging.
+- changed the blind structure definition to be with relation to the number of player actions instead of the number of rounds. This is closer to time dependent blind structures.
+- added option to give predefined decks to the dealer for the whole game. This was used to mirror games; give each player the same cards over different games, alleviating luck.
+- added option to also return the last two participating player names at the end of a game. This was used to get the 2nd place in a 6max SnG.
+- prints message when attempting illegal action.
+
+
 # PyPokerEngine
 
 [![Build Status](https://travis-ci.org/ishikota/PyPokerEngine.svg?branch=master)](https://travis-ci.org/ishikota/PyPokerEngine)
@@ -144,11 +159,11 @@ class RLPLayer(BasePokerPlayer):
         small_blind_amount = game_info["rule"]["small_blind_amount"]
         ante_amount = game_info["rule"]["ante"]
         blind_structure = game_info["rule"]["blind_structure"]
-        
+
         self.emulator = Emulator()
         self.emulator.set_game_rule(player_num, max_round, small_blind_amount, ante_amount)
         self.emulator.set_blind_structure(blind_structure)
-        
+
         # Register algorithm of each player which used in the simulation.
         for player_info in game_info["seats"]["players"]:
             self.emulator.register_player(player_info["uuid"], SomePlayerModel())
@@ -163,9 +178,8 @@ class RLPLayer(BasePokerPlayer):
             return # you would declare CALL or RAISE action
         else:
             return "fold", 0
-    
+
 ```
 
 # Documentation
 For mode detail, please checkout [doc site](https://ishikota.github.io/PyPokerEngine/)
-

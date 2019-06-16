@@ -19,6 +19,7 @@ class Dealer:
     self.cheat = cheat
     self.table = Table(cheat = self.cheat, cst_deck_ids = cst_deck_ids)
     self.blind_structure = {}
+    self.play_count=0
 
   def register_player(self, player_name, algorithm):
     self.__config_check()
@@ -31,15 +32,20 @@ class Dealer:
 
   def start_game(self, max_round):
     table = self.table
+    last_two = []
     self.__notify_game_start(max_round)
     ante, sb_amount = self.ante, self.small_blind_amount
     for round_count in range(1, max_round+1):
-      ante, sb_amount = self.__update_forced_bet_amount(ante, sb_amount, round_count, self.blind_structure)
       table = self.__exclude_short_of_money_players(table, ante, sb_amount)
+      self.play_count+=table.seats.count_active_players()
+      #print(table.seats.count_active_players())
+      if(table.seats.count_active_players())==2:
+          last_two = [player.name for player in table.seats.players if player.is_active()]
+      ante, sb_amount = self.__update_forced_bet_amount(ante, sb_amount, round_count, self.blind_structure)
       if self.__is_game_finished(table): break
       table = self.play_round(round_count, sb_amount, ante, table)
       table.shift_dealer_btn()
-    return self.__generate_game_result(max_round, table.seats)
+    return self.__generate_game_result(max_round, table.seats), last_two
 
   def play_round(self, round_count, blind_amount, ante, table):
     state, msgs = RoundManager.start_new_round(round_count, blind_amount, ante, table)
@@ -64,12 +70,17 @@ class Dealer:
     self.blind_structure = blind_structure
 
   def __update_forced_bet_amount(self, ante, sb_amount, round_count, blind_structure):
-    if round_count in blind_structure:
-      update_info = blind_structure[round_count]
-      msg = self.message_summarizer.summairze_blind_level_update(\
-              round_count, ante, update_info["ante"], sb_amount, update_info["small_blind"])
-      self.message_summarizer.print_message(msg)
-      ante, sb_amount = update_info["ante"], update_info["small_blind"]
+    used_keys=[]
+    for play_count_cap in blind_structure.keys():
+      if self.play_count>=play_count_cap:
+        update_info = blind_structure[play_count_cap]
+        used_keys.append(play_count_cap)
+        msg = self.message_summarizer.summairze_blind_level_update(\
+                round_count, ante, update_info["ante"], sb_amount, update_info["small_blind"])
+        #self.message_summarizer.print_message(msg)
+        ante, sb_amount = update_info["ante"], update_info["small_blind"]
+    for used_key in used_keys:
+      self.blind_structure.pop(used_key,None)
     return ante, sb_amount
 
   def __register_algorithm_to_message_handler(self, uuid, algorithm):

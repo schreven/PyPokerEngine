@@ -7,7 +7,8 @@ class ActionChecker:
   def correct_action(self, players, player_pos, sb_amount, action, amount=None):
     if self.is_allin(players[player_pos], action, amount):
       amount = players[player_pos].stack + players[player_pos].paid_sum()
-    elif self.__is_illegal(players, player_pos, sb_amount, action, amount):
+    elif self.__is_illegal(players, player_pos, sb_amount, action, amount):    
+        print('[ERROR] From action_checker, correct_action: illegal action. Folding')
       action, amount = "fold", 0
     return action, amount
 
@@ -63,7 +64,7 @@ class ActionChecker:
       illegal= self.__is_short_of_money(players[player_pos], amount) \
           or self.__is_illegal_raise(players, amount, sb_amount)
     if illegal:
-        print('[ERROR] attempting illegal action')
+        print('[ERROR] From action_checker, is_illegal: Attempting illegal action')
         #sys.exit(1)
     return illegal
   @classmethod
