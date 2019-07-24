@@ -4,18 +4,21 @@ from pypokerengine.players import BasePokerPlayer
 def setup_config(max_round, initial_stack, small_blind_amount, ante=0):
     return Config(max_round, initial_stack, small_blind_amount, ante)
 
-def start_poker(config, verbose=2, cheat = False, cst_deck_ids = [], return_last_two = False):
+def start_poker(config, verbose=2, cheat = False, cst_deck_ids = [], return_last_two = False, return_lstm_rank = False):
     config.validation()
     dealer = Dealer(config.sb_amount, config.initial_stack, config.ante, cheat=cheat, cst_deck_ids = cst_deck_ids)
     dealer.set_verbose(verbose)
     dealer.set_blind_structure(config.blind_structure)
     for info in config.players_info:
         dealer.register_player(info["name"], info["algorithm"])
-    result_message, last_two = dealer.start_game(config.max_round)
+    result_message, last_two, lstm_rank = dealer.start_game(config.max_round)
     if not(return_last_two):
         return _format_result(result_message)
     else:
-        return _format_result(result_message), last_two
+        if not(return_lstm_rank):
+            return _format_result(result_message), last_two
+        else: 
+            return _format_result(result_message), last_two, lstm_rank
 
 def _format_result(result_message):
     return {
