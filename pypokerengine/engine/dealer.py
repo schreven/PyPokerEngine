@@ -33,7 +33,7 @@ class Dealer:
   def start_game(self, max_round):
     table = self.table
     last_two = []
-    lstm_rank = 0
+    deepbot_rank = 0
     self.__notify_game_start(max_round)
     ante, sb_amount = self.ante, self.small_blind_amount
     for round_count in range(1, max_round+1):
@@ -42,20 +42,20 @@ class Dealer:
       #save last two survivor names
       if(table.seats.count_active_players())==2:
           last_two = [player.name for player in table.seats.players if player.is_active()]
-      #check if lstm bot lost
-      lstm_bot_activity = [player.is_active() for player in table.seats.players if player.name=='lstm_bot']
-      if len(lstm_bot_activity) !=0:
-          if not(lstm_bot_activity[0]):
-              lstm_rank = len([player.name for player in table.seats.players if player.is_active()])
+      #check if deepbot lost
+      deepbot_activity = [player.is_active() for player in table.seats.players if player.name=='deepbot']
+      if len(deepbot_activity) !=0:
+          if not(deepbot_activity[0]):
+              deepbot_rank = len([player.name for player in table.seats.players if player.is_active()])
               break
-        
+
       ante, sb_amount = self.__update_forced_bet_amount(ante, sb_amount, round_count, self.blind_structure)
       if self.__is_game_finished(table): break
       table = self.play_round(round_count, sb_amount, ante, table)
       table.shift_dealer_btn()
-    return self.__generate_game_result(max_round, table.seats), last_two, lstm_rank
+    return self.__generate_game_result(max_round, table.seats), last_two, deepbot_rank
 
-  def play_round(self, round_count, blind_amount, ante, table):            
+  def play_round(self, round_count, blind_amount, ante, table):
     state, msgs = RoundManager.start_new_round(round_count, blind_amount, ante, table)
     while True:
       self.__message_check(msgs, state["street"])
@@ -292,4 +292,3 @@ class MessageSummarizer(object):
     def summairze_blind_level_update(self, round_count, old_ante, new_ante, old_sb_amount, new_sb_amount):
         base = 'Blind level update at round-%d : Ante %s -> %s, SmallBlind %s -> %s'
         return base % (round_count, old_ante, new_ante, old_sb_amount, new_sb_amount)
-
